@@ -1,59 +1,50 @@
 # BeginAngular
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.2.
+## 📒 Ghi chú: hàm và từ khoá quan trọng
 
-## Development server
+### 🔐 Từ khoá trong class
 
-To start a local development server, run:
+| Từ khoá     | Tác dụng                                                   | Ví dụ                                                         |
+| ----------- | ---------------------------------------------------------- | ------------------------------------------------------------- |
+| `public`    | Mặc định: ai cũng dùng được                                | `title = signal('')`                                          |
+| `protected` | Class và template dùng được, component khác thì không      | `protected addSample() {}`                                    |
+| `private`   | Chỉ dùng trong class, template **không** dùng được         | `private helper() {}`                                         |
+| `readonly`  | Không gán lại được (chỉ dùng cho biến, không dùng cho hàm) | `protected readonly todos = signal([])`                       |
+| `interface` | Mô tả hình dạng dữ liệu, TypeScript báo lỗi khi sai        | `interface Todo { id: number; title: string; done: boolean }` |
 
-```bash
-ng serve
-```
+> 💡 **Quy ước:** signal/computed dùng `protected readonly` · hàm template gọi dùng `protected` · thứ chỉ dùng nội bộ dùng `private`
+>
+> 💡 `readonly` khoá **cái hộp**, không khoá đồ bên trong: `this.todos = signal([])` ❌ · `this.todos.set([])` ✅
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### ⚡ Signals (`@angular/core`)
 
-## Code scaffolding
+| Hàm            | Tác dụng                                                      | Ví dụ                                      |
+| -------------- | ------------------------------------------------------------- | ------------------------------------------ |
+| `signal<T>(v)` | Tạo hộp chứa dữ liệu                                          | `signal<Todo[]>([])`                       |
+| `x()`          | Đọc giá trị                                                   | `todos().length`                           |
+| `x.set(v)`     | Thay bằng giá trị mới                                         | `title.set('Việc mới')`                    |
+| `x.update(fn)` | Tính giá trị mới từ giá trị cũ                                | `todos.update(list => [...list, todo])`    |
+| `computed(fn)` | Signal tự tính từ signal khác: tự cập nhật, có cache, chỉ đọc | `computed(() => this.todos().length >= 5)` |
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+> ⚠️ `update` phải trả về mảng/object **mới**, ví dụ `[...list, todo]`. Không dùng `push`.
 
-```bash
-ng generate component component-name
-```
+### 🧩 Component: `@Component({...})`
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+| Thuộc tính    | Tác dụng                          | Ví dụ                        |
+| ------------- | --------------------------------- | ---------------------------- |
+| `selector`    | Tên thẻ HTML của component        | `'app-todo-list'`            |
+| `templateUrl` | File giao diện                    | `'./todo-list.html'`         |
+| `styleUrl`    | File style                        | `'./todo-list.scss'`         |
+| `imports`     | Những thứ template được phép dùng | `[RouterLink, RouterOutlet]` |
 
-```bash
-ng generate --help
-```
+> ⚠️ Muốn dùng gì trong template thì phải khai báo **2 chỗ**: `import { ... } from '...'` ở đầu file **và** mảng `imports: [...]`.
 
-## Building
+### 🧭 Router (`@angular/router`)
 
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+| Tên                 | Tác dụng                                              | Ví dụ                                    |
+| ------------------- | ----------------------------------------------------- | ---------------------------------------- |
+| `Routes`            | Danh sách route (`path` **không** có `/` ở đầu)       | `{ path: 'todos', component: TodoList }` |
+| `RouterOutlet`      | Khung hiển thị trang theo URL                         | `<router-outlet />`                      |
+| `RouterLink`        | Chuyển trang mà không tải lại                         | `<a routerLink="/todos">Todos</a>`       |
+| `provideRouter()`   | Bật router cho app (trong `app.config.ts`)            | `provideRouter(routes)`                  |
+| `provideRouter([])` | Dùng trong test có `RouterLink` để tránh lỗi `NG0201` | `providers: [provideRouter([])]`         |
