@@ -1,1 +1,2 @@
-<p>todo-list works!</p>
+<p>Đã xong {{ doneCount() }} / {{ todos().length }} việc</p>
+<button (click)="addSample()" [disabled]="isFull()">Add Todo</button>
