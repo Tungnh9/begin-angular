@@ -1,17 +1,16 @@
 <div>
-    <p>Đã xong {{ doneCount() }} / {{ todos().length }} việc</p>
-    <button (click)="addSample()" [disabled]="isFull()">Add Todo</button>
+  <p>Đã xong {{ doneCount() }} / {{ todos().length }} việc</p>
+  <button (click)="addSample()" [disabled]="isFull()">Add Todo</button>
 
-    @for (todo of todos(); track todo.id) {
-        <p>{{ todo.done ? '✅' : '⬜' }} - {{ todo.title }}</p>
+  @for (todo of todos(); track todo.id) {
+    <app-todo-item [todo]="todo" (toggled)="onTodoToggled($event)" />
+  } @empty {
+    <p>No todos found.</p>
+  }
 
-    } @empty {
-        <p>No todos found.</p>
-    }
-
-    @if (isFull()) {
-        <p>Danh sách đã đầy, không thêm được nữa.</p>
-    } @else {
-        <p>Còn thêm được {{ 5 - todos().length }} việc nữa.</p>
-    }
+  @if (isFull()) {
+    <p>Danh sách đã đầy, không thêm được nữa.</p>
+  } @else {
+    <p>Còn thêm được {{ 5 - todos().length }} việc nữa.</p>
+  }
 </div>
