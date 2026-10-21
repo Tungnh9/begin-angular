@@ -12,9 +12,11 @@
 | `readonly`  | Không gán lại được (chỉ dùng cho biến, không dùng cho hàm) | `protected readonly todos = signal([])`                       |
 | `interface` | Mô tả hình dạng dữ liệu, TypeScript báo lỗi khi sai        | `interface Todo { id: number; title: string; done: boolean }` |
 
-> 💡 **Quy ước:** signal/computed dùng `protected readonly` · hàm template gọi dùng `protected` · thứ chỉ dùng nội bộ dùng `private`
+> 💡 **Quy ước:** signal/computed dùng `protected readonly` · `input`/`output` dùng `readonly` (**không** `protected`) · hàm template gọi dùng `protected` · thứ chỉ dùng nội bộ dùng `private`
 >
 > 💡 `readonly` khoá **cái hộp**, không khoá đồ bên trong: `this.todos = signal([])` ❌ · `this.todos.set([])` ✅
+>
+> 💡 Bỏ `readonly` khi phải gán lại bằng `=` hoặc `++`, ví dụ `private nextId = 4;` rồi `this.nextId++`
 
 ### ⚡ Signals (`@angular/core`)
 
@@ -26,7 +28,14 @@
 | `x.update(fn)` | Tính giá trị mới từ giá trị cũ                                | `todos.update(list => [...list, todo])`    |
 | `computed(fn)` | Signal tự tính từ signal khác: tự cập nhật, có cache, chỉ đọc | `computed(() => this.todos().length >= 5)` |
 
-> ⚠️ `update` phải trả về mảng/object **mới**, ví dụ `[...list, todo]`. Không dùng `push`.
+> ⚠️ `update` phải trả về mảng/object **mới** (xem nhóm 🔁 bên dưới). Không dùng `push`, không gán trực tiếp kiểu `todo.done = true`.
+
+### 🔁 Tạo mảng/object mới (dùng trong `update`)
+
+| Cú pháp              | Tác dụng                                                    | Ví dụ                                                                         |
+| -------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `list.map(fn)`       | Mảng mới, mỗi phần tử thay bằng kết quả của `fn`            | `list.map((todo) => (todo.id === id ? { ...todo, done: !todo.done } : todo))` |
+| `{ ...obj, key: v }` | Object mới = copy `obj` rồi ghi đè (hoặc thêm) trường `key` | `{ ...todo, done: true }`                                                     |
 
 ### 🧩 Component: `@Component({...})`
 
@@ -38,6 +47,21 @@
 | `imports`     | Những thứ template được phép dùng | `[RouterLink, RouterOutlet]` |
 
 > ⚠️ Muốn dùng gì trong template thì phải khai báo **2 chỗ**: `import { ... } from '...'` ở đầu file **và** mảng `imports: [...]`.
+
+### 🔌 Giao tiếp cha – con (`@angular/core`)
+
+| Tên                   | Tác dụng                                                              | Ví dụ                                                                                   |
+| --------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `input.required<T>()` | Cổng **nhận dữ liệu từ cha** (bắt buộc). Là signal: đọc bằng `todo()` | Con: `readonly todo = input.required<Todo>()` · Cha: `<app-todo-item [todo]="todo" />`  |
+| `output<T>()`         | Cổng để **con báo lên cha**, `T` là kiểu dữ liệu gửi kèm              | Con: `readonly toggled = output<number>()` · Cha: `(toggled)="onTodoToggled($event)"`   |
+| `x.emit(v)`           | Con phát tín hiệu kèm `v`; cha nhận `v` qua `$event`                  | `(click)="toggled.emit(todo().id)"`                                                     |
+| `setInput(name, v)`   | Trong test: tự đóng vai cha, đưa giá trị vào input                    | `fixture.componentRef.setInput('todo', { id: 1, title: 'Learn Angular', done: false })` |
+
+> ⚠️ Lỡ để `protected` cho `input` thì lỗi `TS2445` hiện ở template của **cha** (`todo-list.html`), không phải ở `todo-item.ts`. Riêng `output` để `protected` thì không báo lỗi, nhưng vẫn nên để public cho thống nhất.
+>
+> ⚠️ Trong test, `setInput` phải đặt **trước** `await fixture.whenStable()`, nếu không sẽ lỗi `NG0950` (input bắt buộc chưa có giá trị).
+>
+> 💡 Đặt tên output tránh trùng sự kiện có sẵn của trình duyệt (`click`, `toggle`...), ví dụ dùng `toggled`. Nếu trùng, Angular nghe cả output lẫn sự kiện thật, nên hàm của cha có thể chạy 2 lần.
 
 ### 🧭 Router (`@angular/router`)
 
