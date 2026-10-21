@@ -32,10 +32,11 @@
 
 ### 🔁 Tạo mảng/object mới (dùng trong `update`)
 
-| Cú pháp              | Tác dụng                                                    | Ví dụ                                                                         |
-| -------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `list.map(fn)`       | Mảng mới, mỗi phần tử thay bằng kết quả của `fn`            | `list.map((todo) => (todo.id === id ? { ...todo, done: !todo.done } : todo))` |
-| `{ ...obj, key: v }` | Object mới = copy `obj` rồi ghi đè (hoặc thêm) trường `key` | `{ ...todo, done: true }`                                                     |
+| Cú pháp              | Tác dụng                                                      | Ví dụ                                                                         |
+| -------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `list.map(fn)`       | Mảng mới, mỗi phần tử thay bằng kết quả của `fn`              | `list.map((todo) => (todo.id === id ? { ...todo, done: !todo.done } : todo))` |
+| `list.filter(fn)`    | Mảng mới, chỉ giữ phần tử mà `fn` trả về `true` (dùng để xoá) | `list.filter((todo) => todo.id !== id)`                                       |
+| `{ ...obj, key: v }` | Object mới = copy `obj` rồi ghi đè (hoặc thêm) trường `key`   | `{ ...todo, done: true }`                                                     |
 
 ### 🧩 Component: `@Component({...})`
 
