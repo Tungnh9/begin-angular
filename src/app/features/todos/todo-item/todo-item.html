@@ -3,4 +3,5 @@
     >{{ todo().done ? '✅' : '⬜' }} - {{ todo().title }}</span
   >
   <button (click)="deleted.emit(todo().id)">Xóa</button>
+  <a [routerLink]="['/todos', todo().id]">Chi tiết</a>
 </p>
