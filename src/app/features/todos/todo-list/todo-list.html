@@ -3,7 +3,11 @@
   <button (click)="addSample()" [disabled]="isFull()">Add Todo</button>
 
   @for (todo of todos(); track todo.id) {
-    <app-todo-item [todo]="todo" (toggled)="onTodoToggled($event)" />
+    <app-todo-item
+      [todo]="todo"
+      (toggled)="onTodoToggled($event)"
+      (deleted)="onTodoDeleted($event)"
+    />
   } @empty {
     <p>No todos found.</p>
   }

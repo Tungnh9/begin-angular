@@ -9,5 +9,7 @@ import { Todo } from '../todo.model';
 })
 export class TodoItem {
   readonly todo = input.required<Todo>();
+
   readonly toggled = output<number>();
+  readonly deleted = output<number>();
 }

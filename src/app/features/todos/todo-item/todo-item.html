@@ -1,1 +1,6 @@
-<p (click)="toggled.emit(todo().id)">{{ todo().done ? '✅' : '⬜' }} - {{ todo().title }}</p>
+<p>
+  <span (click)="toggled.emit(todo().id)"
+    >{{ todo().done ? '✅' : '⬜' }} - {{ todo().title }}</span
+  >
+  <button (click)="deleted.emit(todo().id)">Xóa</button>
+</p>

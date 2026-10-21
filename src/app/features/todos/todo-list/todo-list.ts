@@ -9,6 +9,8 @@ import { TodoItem } from '../todo-item/todo-item';
   templateUrl: './todo-list.html',
 })
 export class TodoList {
+  private nextId = 4;
+
   protected readonly todos = signal<Todo[]>([
     { id: 1, title: 'Learn Angular', done: false },
     { id: 2, title: 'Build an app', done: true },
@@ -21,13 +23,19 @@ export class TodoList {
 
   protected addSample() {
     this.todos.update((list) => {
-      return [...list, { id: list.length + 1, title: 'New Todo', done: false }];
+      return [...list, { id: this.nextId++, title: 'New Todo', done: false }];
     });
   }
 
   protected onTodoToggled(id: number) {
     this.todos.update((list) => {
       return list.map((todo) => (todo.id === id ? { ...todo, done: !todo.done } : todo));
-    })
+    });
+  }
+
+  protected onTodoDeleted(id: number) {
+    this.todos.update((list) => {
+      return list.filter((todo) => todo.id !== id);
+    });
   }
 }
