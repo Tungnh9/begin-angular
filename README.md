@@ -66,10 +66,28 @@
 
 ### 🧭 Router (`@angular/router`)
 
-| Tên                 | Tác dụng                                              | Ví dụ                                    |
-| ------------------- | ----------------------------------------------------- | ---------------------------------------- |
-| `Routes`            | Danh sách route (`path` **không** có `/` ở đầu)       | `{ path: 'todos', component: TodoList }` |
-| `RouterOutlet`      | Khung hiển thị trang theo URL                         | `<router-outlet />`                      |
-| `RouterLink`        | Chuyển trang mà không tải lại                         | `<a routerLink="/todos">Todos</a>`       |
-| `provideRouter()`   | Bật router cho app (trong `app.config.ts`)            | `provideRouter(routes)`                  |
-| `provideRouter([])` | Dùng trong test có `RouterLink` để tránh lỗi `NG0201` | `providers: [provideRouter([])]`         |
+| Tên                           | Tác dụng                                                                           | Ví dụ                                                                                                  |
+| ----------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `Routes`                      | Danh sách route (`path` **không** có `/` ở đầu)                                    | `{ path: 'todos', component: TodoList }`                                                               |
+| `:id` trong `path`            | Tham số: chỗ trống khớp mọi giá trị (`/todos/1`, `/todos/2`...)                    | `{ path: 'todos/:id', component: TodoDetail }`                                                         |
+| `RouterOutlet`                | Khung hiển thị trang theo URL                                                      | `<router-outlet />`                                                                                    |
+| `RouterLink`                  | Chuyển trang mà không tải lại                                                      | `<a routerLink="/todos">Todos</a>`                                                                     |
+| `[routerLink]` (mảng)         | Link động: ghép các đoạn trong mảng thành URL                                      | `<a [routerLink]="['/todos', todo().id]">Chi tiết</a>`                                                 |
+| `provideRouter()`             | Bật router cho app (trong `app.config.ts`)                                         | `provideRouter(routes)`                                                                                |
+| `withComponentInputBinding()` | Đưa tham số trên URL vào `input` **cùng tên** của trang (giá trị luôn là `string`) | `provideRouter(routes, withComponentInputBinding())` · Trang: `readonly id = input.required<string>()` |
+| `provideRouter([])`           | Dùng trong test có `RouterLink` để tránh lỗi `NG0201`                              | `providers: [provideRouter([])]`                                                                       |
+
+> ⚠️ Tên `input` phải **giống hệt** tên tham số (`:id` ↔ `id`). Khác tên thì giá trị rỗng mà không báo lỗi.
+>
+> ⚠️ `[routerLink]` dạng mảng **bắt buộc** có ngoặc vuông. Thiếu thì link sai mà không báo lỗi.
+>
+> ⚠️ Component **chứa** component con dùng `RouterLink` thì test của nó cũng cần `provideRouter([])`, ví dụ `todo-list.spec.ts`.
+
+### 🖥️ Render trên server (`@angular/ssr`, file `app.routes.server.ts`)
+
+| Tên                    | Tác dụng                                                     | Ví dụ                                                  |
+| ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------ |
+| `RenderMode.Prerender` | Vẽ sẵn trang **lúc build**                                   | `{ path: '**', renderMode: RenderMode.Prerender }`     |
+| `RenderMode.Server`    | Vẽ trang **mỗi khi có người mở** (dùng cho route có tham số) | `{ path: 'todos/:id', renderMode: RenderMode.Server }` |
+
+> ⚠️ Route có tham số mà để `Prerender` thì `npm run build` lỗi `getPrerenderParams is missing`, trong khi `npm start` không báo gì.
