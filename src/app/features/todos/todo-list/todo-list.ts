@@ -1,6 +1,6 @@
-import { Component, signal, computed } from '@angular/core';
-import { Todo } from '../todo.model';
+import { Component, computed, inject } from '@angular/core';
 import { TodoItem } from '../todo-item/todo-item';
+import { TodoStore } from '../todo-store';
 
 @Component({
   imports: [TodoItem],
@@ -9,33 +9,23 @@ import { TodoItem } from '../todo-item/todo-item';
   templateUrl: './todo-list.html',
 })
 export class TodoList {
-  private nextId = 4;
+  private readonly store = inject(TodoStore);
 
-  protected readonly todos = signal<Todo[]>([
-    { id: 1, title: 'Learn Angular', done: false },
-    { id: 2, title: 'Build an app', done: true },
-    { id: 3, title: 'Deploy to production', done: true },
-  ]);
+  protected readonly todos = this.store.todos;
 
   protected readonly doneCount = computed(() => this.todos().filter((todo) => todo.done).length);
 
   protected readonly isFull = computed(() => this.todos().length >= 5);
 
   protected addSample() {
-    this.todos.update((list) => {
-      return [...list, { id: this.nextId++, title: 'New Todo', done: false }];
-    });
+    this.store.add(`New Todo`);
   }
 
   protected onTodoToggled(id: number) {
-    this.todos.update((list) => {
-      return list.map((todo) => (todo.id === id ? { ...todo, done: !todo.done } : todo));
-    });
+    this.store.toggle(id);
   }
 
   protected onTodoDeleted(id: number) {
-    this.todos.update((list) => {
-      return list.filter((todo) => todo.id !== id);
-    });
+    this.store.remove(id);
   }
 }
