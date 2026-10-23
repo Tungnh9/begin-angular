@@ -30,13 +30,16 @@
 
 > ⚠️ `update` phải trả về mảng/object **mới** (xem nhóm 🔁 bên dưới). Không dùng `push`, không gán trực tiếp kiểu `todo.done = true`.
 
-### 🔁 Tạo mảng/object mới (dùng trong `update`)
+### 🔁 Làm việc với mảng/object
 
-| Cú pháp              | Tác dụng                                                      | Ví dụ                                                                         |
-| -------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `list.map(fn)`       | Mảng mới, mỗi phần tử thay bằng kết quả của `fn`              | `list.map((todo) => (todo.id === id ? { ...todo, done: !todo.done } : todo))` |
-| `list.filter(fn)`    | Mảng mới, chỉ giữ phần tử mà `fn` trả về `true` (dùng để xoá) | `list.filter((todo) => todo.id !== id)`                                       |
-| `{ ...obj, key: v }` | Object mới = copy `obj` rồi ghi đè (hoặc thêm) trường `key`   | `{ ...todo, done: true }`                                                     |
+| Cú pháp              | Tác dụng                                                             | Ví dụ                                                                         |
+| -------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `list.map(fn)`       | Mảng mới, mỗi phần tử thay bằng kết quả của `fn`                     | `list.map((todo) => (todo.id === id ? { ...todo, done: !todo.done } : todo))` |
+| `list.filter(fn)`    | Mảng mới, chỉ giữ phần tử mà `fn` trả về `true` (dùng để xoá)        | `list.filter((todo) => todo.id !== id)`                                       |
+| `{ ...obj, key: v }` | Object mới = copy `obj` rồi ghi đè (hoặc thêm) trường `key`          | `{ ...todo, done: true }`                                                     |
+| `list.find(fn)`      | Trả về phần tử **đầu tiên** thoả điều kiện, không có thì `undefined` | `list.find((todo) => todo.id === 2)`                                          |
+
+> 💡 `find` có thể trả về `undefined`, nên trong template dùng `@if (todo(); as found) { ... } @else { ... }`. Bên trong khối, `found` là todo thật, viết `found.title` (không có `()`).
 
 ### 🧩 Component: `@Component({...})`
 
@@ -64,6 +67,23 @@
 >
 > 💡 Đặt tên output tránh trùng sự kiện có sẵn của trình duyệt (`click`, `toggle`...), ví dụ dùng `toggled`. Nếu trùng, Angular nghe cả output lẫn sự kiện thật, nên hàm của cha có thể chạy 2 lần.
 
+### 🧰 Service: kho dữ liệu dùng chung (`@angular/core`)
+
+| Tên          | Tác dụng                                                                                                                                           | Ví dụ                                        |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `@Service()` | Đánh dấu class là service: Angular tạo **một** đối tượng dùng chung cho cả app. Tutorial cũ viết `@Injectable({ providedIn: 'root' })`, cùng nghĩa | `@Service() export class TodoStore {}`       |
+| `inject(T)`  | Xin Angular đưa service dùng chung                                                                                                                 | `private readonly store = inject(TodoStore)` |
+
+> ⚠️ Dòng `store = inject(...)` phải nằm **trên** các thuộc tính dùng `this.store`, nếu không lỗi `TS2729` (thuộc tính được tạo lần lượt từ trên xuống).
+>
+> ⚠️ Không dùng `new TodoStore()`: nó tạo ra một kho **riêng**, không dùng chung được.
+>
+> 💡 Những gì component gọi trong service (`todos`, `add`...) phải public, **không** `protected`, nếu không lỗi `TS2445`.
+>
+> 💡 Dữ liệu cần giữ lâu hoặc dùng chung giữa các trang phải nằm trong service. Dữ liệu trong component mất khi rời trang.
+>
+> 💡 Đặt tên service tránh trùng model: `ng g s features/todos/todo-store` (class `TodoStore`), không dùng `todo` (class `Todo` trùng với `interface Todo`).
+
 ### 🧭 Router (`@angular/router`)
 
 | Tên                           | Tác dụng                                                                           | Ví dụ                                                                                                  |
@@ -78,6 +98,8 @@
 | `provideRouter([])`           | Dùng trong test có `RouterLink` để tránh lỗi `NG0201`                              | `providers: [provideRouter([])]`                                                                       |
 
 > ⚠️ Tên `input` phải **giống hệt** tên tham số (`:id` ↔ `id`). Khác tên thì giá trị rỗng mà không báo lỗi.
+>
+> ⚠️ Tham số là chữ (`"2"`), còn `todo.id` là số. Muốn so sánh thì đổi bằng `Number(this.id())`, nếu không lỗi `TS2367`.
 >
 > ⚠️ `[routerLink]` dạng mảng **bắt buộc** có ngoặc vuông. Thiếu thì link sai mà không báo lỗi.
 >
